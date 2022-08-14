@@ -69,12 +69,10 @@ class DSSpider(Spider):
             logo_title = job_listing_img.css("::attr(title)")
             items["LogoTitle"] = logo_title.extract()
 
-            job_listing_rating = job_listing.css(
-                "div > span[class='job-search-key-srfzj0 e1cjmv6j0']"
+            # limit to first text with .get() instead of .extract()
+            rating = job_listing.css(
+                "div > span[class=' job-search-key-srfzj0 e1cjmv6j0']::text"
             )
-
-            # # limit to first text with .get() instead of .extract()
-            # rating = job_listing_rating.xpath("//text()")
-            # items["CompanyRating"] = [rating.get()]
+            items["CompanyRating"] = [rating.get()]
 
             yield items

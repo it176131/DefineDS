@@ -29,5 +29,5 @@ class CrawlGdItem(scrapy.Item):
     LogoSRC = scrapy.Field()
     LogoTitle = scrapy.Field()
 
-    # # li > div > span
-    # CompanyRating = scrapy.Field()
+    # li > div > span
+    CompanyRating = scrapy.Field()
