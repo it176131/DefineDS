@@ -6,7 +6,7 @@
 import scrapy
 
 
-class CrawlGdItem(scrapy.Item):
+class CrawlJobListingItem(scrapy.Item):
     ID = scrapy.Field()
     AdvType = scrapy.Field()
     IsOrganicJob = scrapy.Field()
@@ -26,3 +26,10 @@ class CrawlGdItem(scrapy.Item):
     Age = scrapy.Field()
     SalaryEstimate = scrapy.Field()
     SalaryEstimateType = scrapy.Field()
+
+
+class CrawJobDescriptionItem(scrapy.Item):
+    Description = scrapy.Field()
+    Salary = scrapy.Field()
+    Company = scrapy.Field()
+    Rating = scrapy.Field()

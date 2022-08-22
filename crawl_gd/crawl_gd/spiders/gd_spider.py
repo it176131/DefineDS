@@ -1,11 +1,12 @@
+import json
 from scrapy import Request, Spider
 from urllib.parse import urlparse
 from pathlib import Path
-from crawl_gd.items import CrawlGdItem
+from crawl_gd.items import CrawlJobListingItem, CrawJobDescriptionItem
 
 
-class DSSpider(Spider):
-    name = "ds"
+class JobListingSpider(Spider):
+    name = "listing"
 
     allowed_domains = ["glassdoor.com"]
     start_urls = [
@@ -18,7 +19,7 @@ class DSSpider(Spider):
 
     def parse(self, response, **kwargs):
         """"""
-        items = CrawlGdItem()
+        items = CrawlJobListingItem()
         job_listings = response.css("li[data-test='jobListing']")
 
         for idx, job_listing in enumerate(job_listings, start=1):
@@ -94,7 +95,6 @@ class DSSpider(Spider):
 
             yield items
 
-        print("", "Did we make it?", "", sep="\n")
         next_page_url = self.get_next_page_url(response)
 
         if next_page_url is not None:
@@ -102,7 +102,6 @@ class DSSpider(Spider):
 
     def get_next_page_url(self, response):
         """Find and navigate to next page if available"""
-        print("", "Yes we did!", "", sep="\n")
         # what page are we on
         current_page_str = response.css(
             "button[class='page selected css-1hq9k8 e13qs2071']"
@@ -127,3 +126,39 @@ class DSSpider(Spider):
             return next_page_url
 
         return None
+
+
+class JobDescriptionSpider(Spider):
+    """"""
+
+    name = "description"
+
+    allowed_domains = ["glassdoor.com"]
+
+    def __init__(self, *args, **kwargs):
+        self._get_start_urls()
+        super().__init__(*args, **kwargs)
+
+    def _get_start_urls(self):
+        """"""
+        job_listings_path = Path.cwd() / "html" / "job_listings.json"
+        with job_listings_path.open(mode="rb") as f:
+            job_listings = json.load(fp=f)
+
+        for job_listing in job_listings:
+            href_list = job_listing.get("HREF")
+            href = href_list[0]
+
+            if href:
+                job_listing_url = f"{self.allowed_domains[0]}{href}"
+                self.start_urls.append(job_listing_url)
+
+    def parse(self, response, **kwargs):
+        """"""
+        items = CrawJobDescriptionItem()
+
+        description = response.css(
+            "div[id='JobDescriptionContainer'] > div > div > div"
+        )
+
+        items["Description"] = description.getall()
